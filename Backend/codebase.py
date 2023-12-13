@@ -4,6 +4,7 @@ from dimod import Binary, ConstrainedQuadraticModel, quicksum
 from dwave.system import LeapHybridCQMSampler
 import numpy as np
 from Data_preprocessing import graph_init
+from score import get_score
 from dwave.system import DWaveSampler, EmbeddingComposite, FixedEmbeddingComposite
 from minorminer.busclique import find_clique_embedding
 import numpy as np
