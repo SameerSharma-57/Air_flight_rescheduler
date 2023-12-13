@@ -50,12 +50,11 @@ def cqm_formulation():
         cqm.add_constraint( (quicksum(X[i,j]*comp[i][j] for j in range(M))) == 1)
 
     for i in range(K):
-        f_i_d,f_i_t = pnr.loc[i]['DEP_DTMZ'].split(" ")
+        f_i_d= pnr.loc[i]['ARR_DTML'].split(" ")
         def F(j):
             inv_no = g.path_mapping[j][0]
-            f_j_d = inv.loc[inv_no]['DepartureDate']
-            f_j_t = sch.loc[inv.loc[inv_no]['ScheduleId']]['DepartureTime'] 
-            return g.get_time_diff(f_i_d,f_i_t,f_j_d,f_j_t)
+            f_j_d = inv.loc[inv_no]['ArrivalDateTime']
+            return g.get_time_diff(f_i_d,f_j_d)
 
             
         cqm.add_constraint( (quicksum(F(j)*X[i,j] for j in range(M)))<=72)

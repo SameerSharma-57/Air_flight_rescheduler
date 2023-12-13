@@ -8,6 +8,7 @@ from more_itertools import collapse
 inv = pd.read_csv('final_data/inv.csv')
 pnr = pd.read_csv('final_data/pnrb.csv')
 sch = pd.read_csv('final_data/sch.csv')
+pnrp = pd.read_csv('final_data/pnrp.csv')
 
 inv.set_index('InventoryId',inplace=True)
 sch.set_index('ScheduleID',inplace=True)
@@ -44,6 +45,12 @@ class Graph:
         t2 = datetime.strptime(d2,format)
         return (t2-t1).total_seconds()/3600
     
+    def update_db(self):
+        self.inv = inv
+        self.pnr = pnr
+        self.sch = sch
+        self.prnp = pnrp
+
 
     def __init__(self, vertices , affected_vertices = []):
         self.V = len(vertices)
