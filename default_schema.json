@@ -1,18 +1,31 @@
 {
     "PNR": {
         "SSR": {"selected": false, "score": 0},
-        "cabin": {"selected": false, "score": 0},
-        "class": {"selected": false, "score": 0},
-        "check_in": {"selected": false, "score": 0},
-        "baggage": {"selected": false, "score": 0},
+        "cabinF": {"selected": false, "score": 0},
+        "cabinJ": {"selected": false, "score": 0},
+        "cabinY": {"selected": false, "score": 0},
+        "classA": {"selected": false, "score": 0},
+        "classC": {"selected": false, "score": 0},
+        "classK": {"selected": false, "score": 0},
         "connection": {"selected": false, "score": 0},
-        "paid_service": {"selected": false, "score": 0}
+        "paid_service": {"selected": false, "score": 0},
+        "booking_type": {"selected": false, "score": 0},
+        "no_of_pax": {"selected": false, "score": 0},
+        "loyalty": {"selected": false, "score": 0}
     },
     "Flight": {
-        "arrival_delay": {"selected": false, "score": 0},
+        "arrival_delay_6": {"selected": false, "score": 0},
+        "arrival_delay_12": {"selected": false, "score": 0},
+        "arrival_delay_24": {"selected": false, "score": 0},
+        "arrival_delay_48": {"selected": false, "score": 0},
         "equipment": {"selected": false, "score": 0},
-        "city_pairs": {"selected": false, "score": 0},
-        "ostd": {"selected": false, "score": 0},
+        "city_pairs_same": {"selected": false, "score": 0},
+        "city_pairs_near": {"selected": false, "score": 0},
+        "city_pairs_different": {"selected": false, "score": 0},
+        "std6": {"selected": false, "score": 0},
+        "std12": {"selected": false, "score": 0},
+        "std24": {"selected": false, "score": 0},
+        "std48": {"selected": false, "score": 0},
         "stopover": {"selected": false, "score": 0}
     },
 
