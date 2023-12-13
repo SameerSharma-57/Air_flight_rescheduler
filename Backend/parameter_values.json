@@ -1,54 +1,37 @@
 {
     "PNR": {
-        "SSR": {
-            "selected": false,
-            "score": 32314
-        },
-        "cabin": {
-            "selected": false,
-            "score": 0
-        },
-        "class": {
-            "selected": false,
-            "score": 0
-        },
-        "check_in": {
-            "selected": false,
-            "score": 0
-        },
-        "baggage": {
-            "selected": false,
-            "score": 0
-        },
-        "connection": {
-            "selected": false,
-            "score": 0
-        },
-        "paid_service": {
-            "selected": false,
-            "score": 0
-        }
+        "SSR": {"selected": true, "score": 200},
+        "cabinF": {"selected": true, "score": 1700},
+        "cabinJ": {"selected": true, "score": 2000},
+        "cabinY": {"selected": true, "score": 1500},
+        "classA": {"selected": true, "score": 1000},
+        "classC": {"selected": true, "score": 700},
+        "classK": {"selected": true, "score": 500},
+        "connection": {"selected": true, "score": 100},
+        "paid_service": {"selected": true, "score": 200},
+        "booking_type": {"selected": true, "score": 500},
+        "no_of_pax": {"selected": true, "score": 50},
+        "loyalty": {"selected": true, "score": 2000}
     },
     "Flight": {
-        "arrival_delay": {
-            "selected": false,
-            "score": 0
-        },
-        "equipment": {
-            "selected": false,
-            "score": 0
-        },
-        "city_pairs": {
-            "selected": false,
-            "score": 0
-        },
-        "ostd": {
-            "selected": false,
-            "score": 0
-        },
-        "stopover": {
-            "selected": false,
-            "score": 0
-        }
+        "arrival_delay_6": {"selected": true, "score": 70},
+        "arrival_delay_12": {"selected": true, "score": 50},
+        "arrival_delay_24": {"selected": true, "score": 40},
+        "arrival_delay_48": {"selected": true, "score": 30},
+        "equipment": {"selected": true, "score": 50},
+        "city_pairs_same": {"selected": true, "score": 40},
+        "city_pairs_near": {"selected": true, "score": 30},
+        "city_pairs_different": {"selected": true, "score": 20},
+        "std6": {"selected": true, "score": 70},
+        "std12": {"selected": true, "score": 50},
+        "std24": {"selected": true, "score": 40},
+        "std48": {"selected": true, "score": 30},
+        "stopover": {"selected": true, "score": -20}
+    },
+
+    "Flight Connection":{
+        "Max departure delay": {"selected": true, "score": 0},
+        "Min Connection Time": {"selected": true, "score": 0},
+        "Max Connection Time": {"selected": true, "score": 0}
     }
 }
