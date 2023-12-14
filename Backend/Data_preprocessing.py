@@ -21,6 +21,7 @@ sch.set_index('ScheduleID',inplace=True)
 pnr.set_index('RECLOC',inplace=True)
 
 cancelled_flights = pd.read_csv('final_data/Cancelled.csv')
+pnr['COS_CD'] = pnr['COS_CD'].astype(str)
 # cancelled_flights.set_index('InventoryId',inplace=True)
 
 
@@ -68,6 +69,7 @@ class Graph:
         self.path_mapping=None
         self.all_paths=[[[] for x in range(self.V)] for y in range(self.V)]
         self.affected_vertices = affected_vertices
+        self.path_flight_mapping = None
         
     def add_edge(self, u, v, w):
         u=self.city_mapping[u]
