@@ -1,7 +1,0 @@
-ScheduleID,CarrierCode,FlightNumber,AircraftType,AircraftTailNumber,DepartureAirport,ArrivalAirport,DepartureTime,ArrivalTime,StartDate,EndDate,Status,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Frequency_per_week,Frequency,NoOfDepartures,DepartureDates
-SCH-ZZ-7283355,ZZ,2016,Boeing 787,VT-2620,CCN,MAA,11:13,11:41,05/25/2024,05/25/2024,Scheduled,0,0,0,1,0,0,1,2,47,2,"['12/16/2023', '12/20/2023']"
-SCH-ZZ-7310425,ZZ,2678,Boeing 767,VT-1375,MAA,CCJ,17:34,14:17,08/22/2024,08/22/2024,Planning,0,0,0,0,1,0,1,2,57,3,"['12/07/2023', '12/09/2023', '12/14/2023']"
-SCH-ZZ-8305184,ZZ,2102,Airbus A320 Neo,VT-1490,CCN,CCJ,6:46,6:47,08/23/2024,08/23/2024,Scheduled,0,1,0,0,1,1,1,4,2567,5,"['12/16/2023', '12/18/2023', '12/21/2023', '12/22/2023', '12/23/2023']"
-SCH-ZZ-3126325,ZZ,3171,ATR 72,VT-9254,MAA,HYD,13:00,18:58,01/28/2024,01/28/2024,Scheduled,0,1,1,0,0,0,0,2,23,3,"['12/12/2023', '12/18/2023', '12/19/2023']"
-SCH-ZZ-4285322,ZZ,2016,Boeing 787,VT-2620,CCJ,HYD,11:13,11:41,04/25/2024,04/25/2024,Scheduled,0,0,0,1,0,0,1,2,47,2,"['12/16/2023', '12/20/2023']"
-SCH-ZZ-8305185,ZZ,2102,Airbus A320 Neo,VT-1490,CCN,HYD,6:46,6:47,08/26/2024,08/26/2024,Scheduled,0,1,0,0,1,1,1,4,2567,5,"['12/16/2023', '12/18/2023', '12/21/2023', '12/22/2023', '12/23/2023']"
