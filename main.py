@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import time
 from Backend.codebase import get_best_sample
+import os
 
 def save_boolean_variables_to_json(boolean_variables, filename="Backend/parameter_values.json"):
     with open(filename, "w") as json_file:
@@ -43,10 +44,12 @@ def main():
         with st.expander(f"{category} parameters for ranking:"):
             # Divide the number_inputs into three columns
             col1, col2, col3 = st.columns(3)
-            for i, (param, data) in enumerate(params.items()):
-                
-                col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
-                data["score"] = col.number_input(f"Score for {param.capitalize()}", value=data["score"] ,key=f"{param}_score")
+            i=0
+            for _i, (param, data) in enumerate(params.items()):
+                if data["selected"]:
+                    col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
+                    data["score"] = col.number_input(f"Score for {param.capitalize()}", value=data["score"] ,key=f"{param}_score")
+                    i+=1
 
     save_boolean_variables_to_json(parameters_data)
 
@@ -63,8 +66,7 @@ def main():
     #         value_to_filter = st.number_input("Enter Integer Value to Filter", value=0)
 
     # Upload CSV file
-    st.header("CSV File Uploader")
-    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    
 
     if st.sidebar.button("Run"):
         with st.spinner("Running..."):
@@ -73,12 +75,31 @@ def main():
 
         st.success("Function executed successfully!")
 
-    # If a file is uploaded, read and display its contents
-    if uploaded_file is not None:
-        st.write("Uploaded CSV file:")
-        df = pd.read_csv(uploaded_file)
-        st.write(df)
+    
 
+    
+    
+    st.header(f"CSV File Uploader")
+    selected_file_name = st.selectbox("Select File Name", ["INV", "PNRB", "PNRP", "SCH", "Cancelled"])
+
+
+    # Upload CSV file based on selected file name
+    uploaded_file = st.file_uploader(f"Upload CSV file for {selected_file_name}", type=["csv"])
+
+    # Process and save the uploaded file
+    if uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file)
+
+            # Save the DataFrame to a specified folder
+            save_location = f"Backend/final_data/{selected_file_name}.csv/"
+            
+            df.to_csv(save_location, index=False)
+            st.success(f"{selected_file_name} file successfully uploaded!")
+        except:
+            st.error("Oops! Something went wrong...")
+
+    st.header("Download the results")
     df=pd.read_csv('Backend/final_output.csv')
     st.download_button(
             label="Download CSV",
