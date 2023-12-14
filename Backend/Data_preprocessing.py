@@ -6,14 +6,14 @@ from more_itertools import collapse
 import json
 
 #import data from parameter_values.json
-with open('parameter_values.json','r') as f:
+with open('Backend/parameter_values.json','r') as f:
     data = json.load(f)
 
 
-inv = pd.read_csv('final_data/inv.csv')
-pnr = pd.read_csv('final_data/pnrb.csv')
-sch = pd.read_csv('final_data/sch.csv')
-pnrp = pd.read_csv('final_data/pnrp.csv')
+inv = pd.read_csv('Backend/final_data/INV.csv')
+pnr = pd.read_csv('Backend/final_data/pnrb.csv')
+sch = pd.read_csv('Backend/final_data/sch.csv')
+pnrp = pd.read_csv('Backend/final_data/pnrp.csv')
 
 inv.set_index('InventoryId',inplace=True)
 sch.set_index('ScheduleID',inplace=True)
@@ -21,7 +21,7 @@ sch.set_index('ScheduleID',inplace=True)
 
 
 
-cancelled_flights = pd.read_csv('final_data/Cancelled.csv')
+cancelled_flights = pd.read_csv('Backend/final_data/Cancelled.csv')
 pnr['COS_CD'] = pnr['COS_CD'].astype(str)
 # cancelled_flights.set_index('InventoryId',inplace=True)
 
@@ -244,8 +244,8 @@ def graph_init():
     print("length of pnr",len(pnr))
     # sys.stdout = open('output.txt','w')
     # print("G returned")
-    with open('output.txt','a') as f:
-        print(g.path_pnr_compatibility,file=f)
+    # with open('Backend/output.txt','a') as f:
+    #     print(g.path_pnr_compatibility,file=f)
     print("g returned")
     # print(g.find_all_flight_paths_all_pairs())
     # g.print_graph()

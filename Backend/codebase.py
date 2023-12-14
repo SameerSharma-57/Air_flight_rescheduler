@@ -2,14 +2,14 @@ import dimod
 from dimod import ConstrainedQuadraticModel, quicksum
 from dwave.system import LeapHybridCQMSampler
 import numpy as np
-from Data_preprocessing import graph_init
-from score import ScoreGenerator
+from Backend.Data_preprocessing import graph_init
+from Backend.score import ScoreGenerator
 import numpy as np
 import dwave.cloud as dc
 import json
 import pandas as pd
 
-with open('parameter_values.json','r') as f:
+with open('Backend/parameter_values.json','r') as f:
     data = json.load(f)
 
 g=None
@@ -83,23 +83,25 @@ def cqm_formulation():
     best = feasible_sampleset.first.sample
     return best
 
-best_samples = cqm_formulation()
-with open('sample_output.txt', 'w')as f:
-    print(best_samples, file=f)
+def get_best_sample():
+
+    best_samples = cqm_formulation()
+    with open('Backend/sample_output.txt', 'w')as f:
+        print(best_samples, file=f)
 
 
-df = []
-for i in best_samples:
-    if(best_samples[i]==1.0):
-        
-        x = i.split('_')
-        x[1] = int(x[1])
-        x[2] = int(x[2])
-        passenger_details = g.pnr.loc[x[1]]
-        path = g.path_mapping[x[2]]
-        df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path])
+    df = []
+    for i in best_samples:
+        if(best_samples[i]==1.0):
+            
+            x = i.split('_')
+            x[1] = int(x[1])
+            x[2] = int(x[2])
+            passenger_details = g.pnr.loc[x[1]]
+            path = g.path_mapping[x[2]]
+            df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path])
 
-df.sort()
-df=pd.DataFrame(df)
-df.to_csv('final_output.csv',index=False,header=['RECLOC','DEP_KEY','Path'])
+    df.sort()
+    df=pd.DataFrame(df)
+    df.to_csv('Backend/final_output.csv',index=False,header=['RECLOC','DEP_KEY','Path'])
 

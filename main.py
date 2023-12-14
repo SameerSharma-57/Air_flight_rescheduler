@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import json
+import time
+from Backend.codebase import get_best_sample
 
 def save_boolean_variables_to_json(boolean_variables, filename="Backend\parameter_values.json"):
     with open(filename, "w") as json_file:
@@ -17,6 +19,9 @@ def load_boolean_variables_from_json(filename="Backend\parameter_values.json"):
         with open("default_schema.json","r") as json_file:
             boolean_variables = json.load(json_file)
         return boolean_variables
+    
+def simulate_long_running_function():
+    time.sleep(5)
 
 def main():
     st.title("Mphasis Air flight scheduler")
@@ -61,11 +66,26 @@ def main():
     st.header("CSV File Uploader")
     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
 
+    if st.sidebar.button("Run"):
+        with st.spinner("Running..."):
+            # Simulate a long-running function
+            get_best_sample()
+
+        st.success("Function executed successfully!")
+
     # If a file is uploaded, read and display its contents
     if uploaded_file is not None:
         st.write("Uploaded CSV file:")
         df = pd.read_csv(uploaded_file)
         st.write(df)
+
+    df=pd.read_csv('Backend/final_output.csv')
+    st.download_button(
+            label="Download CSV",
+            data=df.to_csv(index=False).encode(),
+            file_name="download.csv",
+            key="download_button"
+        )
 
 if __name__ == "__main__":
     main()
