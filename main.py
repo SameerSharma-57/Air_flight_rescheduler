@@ -2,11 +2,11 @@ import streamlit as st
 import pandas as pd
 import json
 
-def save_boolean_variables_to_json(boolean_variables, filename="parameter_values.json"):
+def save_boolean_variables_to_json(boolean_variables, filename="Backend\parameter_values.json"):
     with open(filename, "w") as json_file:
         json.dump(boolean_variables, json_file)
 
-def load_boolean_variables_from_json(filename="parameter_values.json"):
+def load_boolean_variables_from_json(filename="Backend\parameter_values.json"):
     default = True
     try:
         with open(filename, "r") as json_file:

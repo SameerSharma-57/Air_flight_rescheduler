@@ -30,7 +30,7 @@
     },
 
     "Flight Connection":{
-        "Max departure delay": {"selected": false, "score": 0},
+        "Max Arrival delay": {"selected": false, "score": 0},
         "Min Connection Time": {"selected": false, "score": 0},
         "Max Connection Time": {"selected": false, "score": 0}
     }

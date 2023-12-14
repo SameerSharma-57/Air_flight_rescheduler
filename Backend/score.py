@@ -45,8 +45,8 @@ class ScoreGenerator:
         print(req_flight)
         print(req_pnr)
         print(data['PNR']['SSR'])
-        p = pnr_data_p[pnr_data_p['RECLOC'] == pnr]
         b = pnr_data_b[pnr]
+        p = pnr_data_p[pnr_data_p['RECLOC'] == b['RECLOC']]
         p.index = range(len(p))
         b.index = range(len(b))
         b = b.iloc[0:1,:]

@@ -9,6 +9,10 @@ from dwave.system import DWaveSampler, EmbeddingComposite, FixedEmbeddingComposi
 from minorminer.busclique import find_clique_embedding
 import numpy as np
 import dwave.cloud as dc
+import json
+
+with open('parameter_values.json','r') as f:
+    data = json.load(f)
 
 cqm = ConstrainedQuadraticModel()
 def init():
@@ -57,13 +61,17 @@ def cqm_formulation():
     for i in range(K):
         cqm.add_constraint( (quicksum(X[i,j]*comp[i][j] for j in range(M))) == 1)
 
-    for i in range(K):
-        f_i_d= pnr.loc[i]['ARR_DTML'].split(" ")
-        def F(j):
-            inv_no = g.path_mapping[j][0]
-            f_j_d = inv.loc[inv_no]['ArrivalDateTime']
-            return g.get_time_diff(f_i_d,f_j_d)   
-        cqm.add_constraint( (quicksum(F(j)*X[i,j] for j in range(M)))<=72)
+
+    if(data['Flight Connection']['Max Arrival delay']['selected'] == True):
+        for i in range(K):
+            f_i_d= pnr.loc[i]['ARR_DTML'].split(" ")
+            def F(j):
+                inv_no = g.path_mapping[j][0]
+                f_j_d = inv.loc[inv_no]['ArrivalDateTime']
+                return g.get_time_diff(f_i_d,f_j_d)
+
+                
+            cqm.add_constraint( (quicksum(F(j)*X[i,j] for j in range(M)))<=data['Flight Connection']['Max Arrival delay']['value'])
 cqm_formulation()
 
 

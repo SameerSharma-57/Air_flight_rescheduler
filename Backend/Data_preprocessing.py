@@ -3,6 +3,11 @@ import numpy as np
 import sys
 from datetime import datetime
 from more_itertools import collapse
+import json
+
+#import data from parameter_values.json
+with open('parameter_values.json','r') as f:
+    data = json.load(f)
 
 
 inv = pd.read_csv('final_data/inv.csv')
@@ -134,9 +139,11 @@ class Graph:
 
                                     time_diff = self.get_time_diff(prev_arrival_date,curr_departure_date)
 
-                                
-                                    if(1<=time_diff<=12):
-                                        temp_paths.append(curr_path+[flight])
+                                    if(not data['Flight Connection']['Min Connection Time']['selected'] or data['Flight Connection']['Min Connection Time']['value']<=time_diff):
+                                        if(not data['Flight Connection']['Max Connection Time']['selected'] or data['Flight Connection']['Max Connection Time']['value']>=time_diff):
+                                            temp_paths.append(curr_path+[flight])
+                                       
+                                    
 
                             curr_paths = temp_paths
                         
@@ -170,10 +177,17 @@ class Graph:
             for path in self.path_city_compatibility[source][dest]:
                 self.path_pnr_compatibility[row['ind']][path]=1
 
+        self.gen_path_flight_mapping()
         return self.path_pnr_compatibility
         
 
-        
+    def gen_path_flight_mapping(self):
+        path_flight_mapping  = {inv.index[i]:[] for i in range(len(inv))}
+        for i,path in enumerate(self.path_mapping):
+            for flight in path:
+                path_flight_mapping[flight].append(i)
+        self.path_flight_mapping = path_flight_mapping
+        return path_flight_mapping
     
 
 
