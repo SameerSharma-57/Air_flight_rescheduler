@@ -18,7 +18,8 @@ pnrp = pd.read_csv('final_data/pnrp.csv')
 inv.set_index('InventoryId',inplace=True)
 sch.set_index('ScheduleID',inplace=True)
 
-pnr.set_index('RECLOC',inplace=True)
+
+
 
 cancelled_flights = pd.read_csv('final_data/Cancelled.csv')
 pnr['COS_CD'] = pnr['COS_CD'].astype(str)
@@ -45,17 +46,31 @@ def print_matrix(matrix):
 class Graph:
 
     def get_time_diff(self,d1,d2):
-        
-        format = '%Y-%m-%d %H:%M:%S'
-        t1 = datetime.strptime(d1,format)
-        t2 = datetime.strptime(d2,format)
+        try:
+            format = '%Y-%m-%d %H:%M:%S'
+            t1 = datetime.strptime(d1,format)
+            
+            
+        except:
+            format = '%m/%d/%Y %H:%M'
+            t1 = datetime.strptime(d1,format)
+
+        try:
+            format = '%Y-%m-%d %H:%M:%S'
+            t2 = datetime.strptime(d2,format)
+            
+            
+        except:
+            format = '%m/%d/%Y %H:%M'
+            t2 = datetime.strptime(d2,format)
+            
         return (t2-t1).total_seconds()/3600
     
     def update_db(self):
         self.inv = inv
         self.pnr = pnr
         self.sch = sch
-        self.prnp = pnrp
+        self.pnrp = pnrp
 
 
     def __init__(self, vertices , affected_vertices = []):
@@ -70,6 +85,7 @@ class Graph:
         self.all_paths=[[[] for x in range(self.V)] for y in range(self.V)]
         self.affected_vertices = affected_vertices
         self.path_flight_mapping = None
+        self.update_db()
         
     def add_edge(self, u, v, w):
         u=self.city_mapping[u]
@@ -109,7 +125,7 @@ class Graph:
     def find_all_flight_paths_all_pairs(self):
         self.path_mapping=[]
         possible_paths_all_pairs=self.all_city_paths_all_pairs()
-
+        # print('find all flight _paths called',len(possible_paths_all_pairs))
         affected_cities = [self.city_mapping[city] for city in self.affected_vertices]
         for _i,possible_paths_one_pair in enumerate(possible_paths_all_pairs):
             for _j,possible_paths in enumerate(possible_paths_one_pair):
@@ -141,10 +157,15 @@ class Graph:
 
                                     time_diff = self.get_time_diff(prev_arrival_date,curr_departure_date)
 
-                                    if(not data['Flight Connection']['Min Connection Time']['selected'] or data['Flight Connection']['Min Connection Time']['value']<=time_diff):
-                                        if(not data['Flight Connection']['Max Connection Time']['selected'] or data['Flight Connection']['Max Connection Time']['value']>=time_diff):
+                                    if(not data['Flight Connection']['Min Connection Time']['selected'] or data['Flight Connection']['Min Connection Time']['score']<=time_diff):
+                                        if(not data['Flight Connection']['Max Connection Time']['selected'] or data['Flight Connection']['Max Connection Time']['score']>=time_diff):
+                                            
                                             temp_paths.append(curr_path+[flight])
-                                       
+
+                                    # if(1<=time_diff<=12):
+                                    #     temp_paths.append(curr_path+[flight])
+                                        
+                                    
                                     
 
                             curr_paths = temp_paths
@@ -198,7 +219,7 @@ class Graph:
         print_matrix(self.graph)
 
 
-def graph_init(affected_cities):
+def graph_init_helper(affected_cities):
     all_cities = list(set(inv['DepartureAirport']).union(set(inv['ArrivalAirport'])))
 
     g = Graph(all_cities,affected_cities)
@@ -209,20 +230,23 @@ def graph_init(affected_cities):
     g.gen_path_pnr_compatibility_matrix()
     return g
 
-def main():
+def graph_init():
     global inv,pnr,sch,cancelled_flights
     inv = inv[~inv.index.isin(cancelled_flights['InventoryId'].to_list())]
-    required_cities = list(set(cancelled_flights['DepartureAirport']).union(set(cancelled_flights['ArrivalAirport'])))
+    affected_cities = list(set(cancelled_flights['DepartureAirport']).union(set(cancelled_flights['ArrivalAirport'])))
     pnr = pnr[pnr['DEP_KEY'].isin(cancelled_flights['Dep_Key'].to_list())]
     pnr['ind'] = [i for i in range(len(pnr))]
-    print(required_cities)
+    pnr.set_index('ind')
+    print(affected_cities)
+    pnr.index = range(0,len(pnr))
     
-    g = graph_init(required_cities)
+    g = graph_init_helper(affected_cities=affected_cities)
+    print("length of pnr",len(pnr))
     # sys.stdout = open('output.txt','w')
-
-    with open('output.txt','w') as f:
-        
+    # print("G returned")
+    with open('output.txt','a') as f:
         print(g.path_pnr_compatibility,file=f)
+    print("g returned")
     # print(g.find_all_flight_paths_all_pairs())
     # g.print_graph()
     # print()
@@ -237,9 +261,10 @@ def main():
     # print()
     # print_matrix(g.path_pnr_compatibility)
     
+    return g
 
-
-
+def main():
+    graph_init()
 if __name__ == "__main__":
     main()
 
