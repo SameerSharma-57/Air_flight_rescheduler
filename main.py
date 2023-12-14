@@ -4,11 +4,11 @@ import json
 import time
 from Backend.codebase import get_best_sample
 
-def save_boolean_variables_to_json(boolean_variables, filename="Backend\parameter_values.json"):
+def save_boolean_variables_to_json(boolean_variables, filename="Backend/parameter_values.json"):
     with open(filename, "w") as json_file:
         json.dump(boolean_variables, json_file)
 
-def load_boolean_variables_from_json(filename="Backend\parameter_values.json"):
+def load_boolean_variables_from_json(filename="Backend/parameter_values.json"):
     default = True
     try:
         with open(filename, "r") as json_file:
@@ -48,7 +48,7 @@ def main():
                 col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
                 data["score"] = col.number_input(f"Score for {param.capitalize()}", value=data["score"] ,key=f"{param}_score")
 
-    save_boolean_variables_to_json(parameters_data, "parameter_values.json")
+    save_boolean_variables_to_json(parameters_data)
 
     # # Display the selected boolean variables and scores
     # st.write("Selected Boolean Variables and Scores:")
