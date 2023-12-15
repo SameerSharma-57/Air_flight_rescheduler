@@ -68,12 +68,7 @@ def main():
     # Upload CSV file
     
 
-    if st.sidebar.button("Run"):
-        with st.spinner("Running..."):
-            # Simulate a long-running function
-            get_best_sample()
-
-        st.success("Function executed successfully!")
+    
 
     
 
@@ -99,7 +94,16 @@ def main():
         except:
             st.error("Oops! Something went wrong...")
 
+
+
     st.header("Download the results")
+
+    if st.sidebar.button("Run"):
+        with st.spinner("Running..."):
+            # Simulate a long-running function
+            get_best_sample()
+
+        st.success("Function executed successfully!")
     df=pd.read_csv('Backend/final_output.csv')
     st.download_button(
             label="Download CSV",

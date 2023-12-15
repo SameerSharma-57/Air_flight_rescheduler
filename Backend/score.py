@@ -1,27 +1,32 @@
 import json
 import pandas as pd
-from datetime import datetime
 from Backend.Data_preprocessing import Graph
+from datetime import datetime
+
 
 def get_time_diff(d1,d2):
+        
+        
         try:
             format = '%Y-%m-%d %H:%M:%S'
             t1 = datetime.strptime(d1,format)
             
             
         except:
+            
             format = '%m/%d/%Y %H:%M'
             t1 = datetime.strptime(d1,format)
+           
+        try:
+            format = '%Y-%m-%d %H:%M:%S'
+            t2 = datetime.strptime(d2,format)
+            
+            
+        except:
+            
+            format = '%m/%d/%Y %H:%M'
+            t2 = datetime.strptime(d2,format)
 
-        try:
-            format = '%Y-%m-%d %H:%M:%S'
-            t2 = datetime.strptime(d2,format)
-            
-            
-        except:
-            format = '%m/%d/%Y %H:%M'
-            t2 = datetime.strptime(d2,format)
-            
         return (t2-t1).total_seconds()/3600
 
 class ScoreGenerator:
@@ -30,7 +35,7 @@ class ScoreGenerator:
         self.g = g
 
     def get_score(self,pnr, flight_path_number):
-        with open('parameter_values.json','r') as f:
+        with open('Backend/parameter_values.json','r') as f:
             data = json.load(f)
         
         score1, score2 = 0, 0
@@ -163,7 +168,7 @@ class ScoreGenerator:
         if len(flight_path) > 2 and 'stopover' in req_flight:
             score2 += req_flight['stopover']['score']
         
-        return score1*score2
+        return -1*score1*score2
 
     # print(get_score('DRGS80', 5*60, 'A320', ['DEL', 'BOM'], 5*60))
 

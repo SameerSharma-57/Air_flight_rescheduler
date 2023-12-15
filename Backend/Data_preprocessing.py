@@ -46,23 +46,27 @@ def print_matrix(matrix):
 class Graph:
 
     def get_time_diff(self,d1,d2):
+        
         try:
             format = '%Y-%m-%d %H:%M:%S'
             t1 = datetime.strptime(d1,format)
             
             
         except:
+            
             format = '%m/%d/%Y %H:%M'
             t1 = datetime.strptime(d1,format)
-
+           
         try:
             format = '%Y-%m-%d %H:%M:%S'
             t2 = datetime.strptime(d2,format)
             
             
         except:
+            
             format = '%m/%d/%Y %H:%M'
             t2 = datetime.strptime(d2,format)
+            
             
         return (t2-t1).total_seconds()/3600
     

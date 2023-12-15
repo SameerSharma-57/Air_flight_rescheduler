@@ -2,27 +2,30 @@ import dimod
 from dimod import ConstrainedQuadraticModel, quicksum
 from dwave.system import LeapHybridCQMSampler
 import numpy as np
-from Backend.Data_preprocessing import graph_init
+from Backend.Data_preprocessing import graph_init,Graph
 from Backend.score import ScoreGenerator
+
 import numpy as np
 import dwave.cloud as dc
 import json
+import os
 import pandas as pd
 
 with open('Backend/parameter_values.json','r') as f:
     data = json.load(f)
-
+feasible_sampleset=None
 g=None
 cqm = ConstrainedQuadraticModel()
+s=None
 def init():
-    global g
+    global g,s
     g = graph_init()
     s = ScoreGenerator(g)
     return s, g
 
 
 def cqm_formulation():
-    global g
+    global g,feasible_sampleset
     s, g = init()
     cqm = ConstrainedQuadraticModel()
     g.gen_path_pnr_compatibility_matrix()
@@ -46,7 +49,7 @@ def cqm_formulation():
     print("Qubo done")
     for i in range(K):
         for j in range(M):
-            qubo += s.get_score(i, j)
+            qubo += X[i,j]*s.get_score(i, j)
         
     cqm.set_objective(qubo)
     print('score calculated')
@@ -73,35 +76,63 @@ def cqm_formulation():
             cqm.add_constraint( (quicksum(F(j)*X[i,j] for j in range(M)))<=data['Flight Connection']['Max Arrival delay']['score'])
 
     sampler = LeapHybridCQMSampler()  
-    sampleset = sampler.sample_cqm(cqm, time_limit=5)
+    sampleset = sampler.sample_cqm(cqm, time_limit=10)
     print("samples generated")
     feasible_sampleset = sampleset.filter(lambda row: row.is_feasible)  
     print(feasible_sampleset.info) 
     qpu_access_time = feasible_sampleset.info['qpu_access_time']
+    
+    #all_feasible_samples = feasible_sampleset.samples
+    #return all_feasible_samples
+    # output_dir = 'tempData'
+    # if not os.path.exists(output_dir):
+    #     os.makedirs(output_dir)
 
+    # for idx, record in enumerate(feasible_sampleset.record.sample):
+    #     sample = record
+    #     output_file = os.path.join(output_dir, f'feasible_solution_{idx}.txt')
+    #     with open(output_file, 'w') as f:
+    #         f.write(str(sample))
 
-    best = feasible_sampleset.first.sample
-    return best
-
+    # best = feasible_sampleset.first.sample
+    return feasible_sampleset
 def get_best_sample():
 
-    best_samples = cqm_formulation()
-    with open('Backend/sample_output.txt', 'w')as f:
-        print(best_samples, file=f)
-
-
-    df = []
-    for i in best_samples:
-        if(best_samples[i]==1.0):
-            
-            x = i.split('_')
-            x[1] = int(x[1])
-            x[2] = int(x[2])
-            passenger_details = g.pnr.loc[x[1]]
-            path = g.path_mapping[x[2]]
-            df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path])
-
-    df.sort()
-    df=pd.DataFrame(df)
-    df.to_csv('Backend/final_output.csv',index=False,header=['RECLOC','DEP_KEY','Path'])
-
+    sample_set = cqm_formulation()
+    # with open('Backend/best.txt', 'w')as f1:
+    #     print(best, file=f1)
+    # with open('Backend/vars.txt', 'w')as f2:
+    #     print(vars, file=f2)
+    output_dir = 'tempData'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    total_score=0
+    score_list=[]
+    for idx,best in enumerate(sample_set):
+        df = []
+        total_score=0
+        for i in best:
+            if(best[i]==1.0):
+                
+                x = i.split('_')
+                x[1] = int(x[1])
+                x[2] = int(x[2])
+                passenger_details = g.pnr.loc[x[1]]
+                path = g.path_mapping[x[2]]
+                score = s.get_score(x[1],x[2])
+                score*=-1
+                total_score+=score
+                
+                df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path,score])
+        print(total_score)
+        score_list.append(total_score)
+    
+        df.sort()
+        df=pd.DataFrame(df)
+        output_file = os.path.join(output_dir, f'feasible_solution_{idx}.csv')
+        df.to_csv(output_file,index=False,header=['RECLOC','DEP_KEY','Path','Score'])
+    print(score_list)
+    df = pd.DataFrame(score_list)
+    df.to_csv('tempData/score.csv',index=False,header=['score'])
+    
+get_best_sample()
