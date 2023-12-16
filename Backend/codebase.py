@@ -38,7 +38,7 @@ def init():
 
 
 def cqm_formulation():
-    global start,end
+    global start,end,tf
     global g,feasible_sampleset
 
     start = time.time()
@@ -120,6 +120,7 @@ def cqm_formulation():
 
 
     qpu_access_time = feasible_sampleset.info['qpu_access_time']
+    print("QPU access time is: ",qpu_access_time,file=tf)
     
     #all_feasible_samples = feasible_sampleset.samples
     #return all_feasible_samples
