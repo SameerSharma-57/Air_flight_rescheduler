@@ -4,6 +4,8 @@ import json
 import time
 from Backend.codebase import get_best_sample
 import os
+from shutil import make_archive
+import base64
 
 def save_boolean_variables_to_json(boolean_variables, filename="Backend/parameter_values.json"):
     with open(filename, "w") as json_file:
@@ -21,8 +23,22 @@ def load_boolean_variables_from_json(filename="Backend/parameter_values.json"):
             boolean_variables = json.load(json_file)
         return boolean_variables
     
-def simulate_long_running_function():
-    time.sleep(5)
+def zip_folder(folder_path, output_path):
+    # Make sure the folder exists
+    
+    if not os.path.exists(folder_path):
+        print(f"The folder '{folder_path}' does not exist.")
+        return
+
+    # Create a zip archive of the folder and its contents
+    make_archive(output_path, 'zip', folder_path)
+
+    print(f"Folder '{folder_path}' has been zipped to '{output_path}.zip'.")
+
+
+def gen_results():
+    get_best_sample()
+    zip_folder('tempData','final')
 
 def main():
     st.title("Mphasis Air flight scheduler")
@@ -53,19 +69,7 @@ def main():
 
     save_boolean_variables_to_json(parameters_data)
 
-    # # Display the selected boolean variables and scores
-    # st.write("Selected Boolean Variables and Scores:")
-    # for category, params in parameters_data.items():
-    #     for param, data in params.items():
-    #         if data['selected']:
-    #             st.write(f"{category} - {param}: Score - {data['score']}")
-
-    # with st.expander("Additional Parameters"):
-    #     filter_by_value = st.checkbox("Filter by Value (Integer)")
-    #     if filter_by_value:
-    #         value_to_filter = st.number_input("Enter Integer Value to Filter", value=0)
-
-    # Upload CSV file
+    
     
 
     
@@ -97,20 +101,40 @@ def main():
 
 
     st.header("Download the results")
-
+    
+    
     if st.sidebar.button("Run"):
         with st.spinner("Running..."):
             # Simulate a long-running function
-            get_best_sample()
+            gen_results()
 
         st.success("Function executed successfully!")
-    df=pd.read_csv('Backend/final_output.csv')
+        # Provide download link for the ZIP file
+
+    zip_filename = "final.zip"  # Replace with your actual ZIP file name
+
+    if not os.path.exists(zip_filename):
+
+        zip_folder('tempData','final')
+
+    
+    
+    with open(zip_filename, "rb") as f:
+        zip_data = f.read()
+        zip_base64 = base64.b64encode(zip_data).decode('utf-8')
+        # st.markdown(f"**[Download {zip_filename}](data:application/zip;base64,{zip_base64})**", unsafe_allow_html=True)
+        # st.success(f"ZIP file '{zip_filename}' is ready for download!")
+
     st.download_button(
-            label="Download CSV",
-            data=df.to_csv(index=False).encode(),
-            file_name="download.csv",
-            key="download_button"
-        )
+        label=f"Download {zip_filename}",
+        data=zip_data,
+        key="download_button zip file",
+        file_name=zip_filename,
+        mime="application/zip"
+    )
+
+    
+
 
 if __name__ == "__main__":
     main()

@@ -4,12 +4,12 @@ from dwave.system import LeapHybridCQMSampler
 import numpy as np
 from Backend.Data_preprocessing import graph_init,Graph
 from Backend.score import ScoreGenerator
-
 import numpy as np
 import dwave.cloud as dc
 import json
 import os
 import pandas as pd
+import time
 
 with open('Backend/parameter_values.json','r') as f:
     data = json.load(f)
@@ -17,6 +17,19 @@ feasible_sampleset=None
 g=None
 cqm = ConstrainedQuadraticModel()
 s=None
+start=0
+end = 0
+
+tf = open('timestamp.txt','w')
+
+def record_time(message):
+    global start,end
+    elapsed_time = end-start
+    hours, remainder = divmod(elapsed_time, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    print(message,"Time elapsed: {} hours, {} minutes, {} seconds".format(int(hours), int(minutes), int(seconds)),file=tf)
+    print(message)
 def init():
     global g,s
     g = graph_init()
@@ -25,15 +38,23 @@ def init():
 
 
 def cqm_formulation():
+    global start,end
     global g,feasible_sampleset
+
+    start = time.time()
     s, g = init()
+    end = time.time()
+    record_time("Data Preprocessing and Path generation")
+
     cqm = ConstrainedQuadraticModel()
-    g.gen_path_pnr_compatibility_matrix()
+    # g.gen_path_pnr_compatibility_matrix()
 
     K = len(g.path_pnr_compatibility)
     M = len(g.path_pnr_compatibility[0])
     print(K)
     print(M)
+
+    start=time.time()
     for i in range(K):
         for j in range(M):
             cqm.add_variable('BINARY', f'X_{i}_{j}')
@@ -46,13 +67,21 @@ def cqm_formulation():
     for i in range(K):
         for j in range(M):
             qubo.add_variable(f'X_{i}_{j}',1)
-    print("Qubo done")
+    end=time.time()
+    record_time("Qubo done")
+    # global tf
+    # tf.close()
+
+    start=time.time()
     for i in range(K):
         for j in range(M):
             qubo += X[i,j]*s.get_score(i, j)
         
     cqm.set_objective(qubo)
-    print('score calculated')
+    end=time.time()
+    record_time('score calculated')
+
+    start=time.time()
     for i in range(K):
         cqm.add_constraint((quicksum(X[i,j] for j in range(M)))==1)
 
@@ -74,12 +103,22 @@ def cqm_formulation():
                 f_j_d = g.inv.loc[inv_no]['ArrivalDateTime']
                 return g.get_time_diff(f_i_d,f_j_d)    
             cqm.add_constraint( (quicksum(F(j)*X[i,j] for j in range(M)))<=data['Flight Connection']['Max Arrival delay']['score'])
+    end=time.time()
+    record_time('Constraints are added')
 
+    start=time.time()
     sampler = LeapHybridCQMSampler()  
     sampleset = sampler.sample_cqm(cqm, time_limit=10)
-    print("samples generated")
-    feasible_sampleset = sampleset.filter(lambda row: row.is_feasible)  
+    end=time.time()
+    record_time("samples generated")
+
+    start=time.time()
+    feasible_sampleset = sampleset.filter(lambda row: row.is_feasible) 
+    end=time.time()
+    record_time('feasible sampleset generated') 
     print(feasible_sampleset.info) 
+
+
     qpu_access_time = feasible_sampleset.info['qpu_access_time']
     
     #all_feasible_samples = feasible_sampleset.samples
@@ -97,12 +136,13 @@ def cqm_formulation():
     # best = feasible_sampleset.first.sample
     return feasible_sampleset
 def get_best_sample():
-
+    global start,end
     sample_set = cqm_formulation()
     # with open('Backend/best.txt', 'w')as f1:
     #     print(best, file=f1)
     # with open('Backend/vars.txt', 'w')as f2:
     #     print(vars, file=f2)
+    start=time.time()
     output_dir = 'tempData'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -134,5 +174,11 @@ def get_best_sample():
     print(score_list)
     df = pd.DataFrame(score_list)
     df.to_csv('tempData/score.csv',index=False,header=['score'])
-    
-get_best_sample()
+    end=time.time()
+    record_time('Post processing done')
+    global tf
+    tf.close()
+def main():
+    get_best_sample()
+if __name__ == "__main__":
+    main()
