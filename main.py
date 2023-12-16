@@ -113,27 +113,24 @@ def main():
 
     zip_filename = "final.zip"  # Replace with your actual ZIP file name
 
-    if not os.path.exists(zip_filename):
-
-        zip_folder('tempData','final')
-
+    if os.path.exists(zip_filename):
     
-    
-    with open(zip_filename, "rb") as f:
-        zip_data = f.read()
-        zip_base64 = base64.b64encode(zip_data).decode('utf-8')
-        # st.markdown(f"**[Download {zip_filename}](data:application/zip;base64,{zip_base64})**", unsafe_allow_html=True)
-        # st.success(f"ZIP file '{zip_filename}' is ready for download!")
+        with open(zip_filename, "rb") as f:
+            zip_data = f.read()
+            zip_base64 = base64.b64encode(zip_data).decode('utf-8')
+            # st.markdown(f"**[Download {zip_filename}](data:application/zip;base64,{zip_base64})**", unsafe_allow_html=True)
+            # st.success(f"ZIP file '{zip_filename}' is ready for download!")
 
-    st.download_button(
-        label=f"Download {zip_filename}",
-        data=zip_data,
-        key="download_button zip file",
-        file_name=zip_filename,
-        mime="application/zip"
-    )
+        st.download_button(
+            label=f"Download {zip_filename}",
+            data=zip_data,
+            key="download_button zip file",
+            file_name=zip_filename,
+            mime="application/zip"
+        )
 
-    
+    else:
+        st.write("Result is not generated yet or didn't hit the run button")
 
 
 if __name__ == "__main__":
