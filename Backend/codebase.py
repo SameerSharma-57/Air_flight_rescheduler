@@ -94,19 +94,19 @@ def cqm_formulation():
         cqm.add_constraint((quicksum(X[i,j] for j in range(M)))==1)
 
     comp = g.path_pnr_compatibility
-    if((not data['Class']['Upgrade']) and (not data['Class']['Downgrade'])):
+    if((not data['Class']['Upgrade']['selected']) and (not data['Class']['Downgrade']['selected'])):
 
         for i in range(K):
             cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]==(j%4)) for j in range(M))) == 1)
 
 
-    elif((data['Class']['Upgrade']) and (not data['Class']['Downgrade'])):
+    elif((data['Class']['Upgrade']['selected']) and (not data['Class']['Downgrade']['selected'])):
 
         for i in range(K):
             cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]>=(j%4)) for j in range(M))) == 1)
 
         
-    elif((not data['Class']['Upgrade']) and (data['Class']['Downgrade'])):
+    elif((not data['Class']['Upgrade']['selected']) and (data['Class']['Downgrade']['selected'])):
 
         for i in range(K):
             cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]<=(j%4)) for j in range(M))) == 1)
