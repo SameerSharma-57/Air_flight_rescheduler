@@ -33,5 +33,10 @@
         "Max Arrival delay": {"selected": false, "score": 0},
         "Min Connection Time": {"selected": false, "score": 0},
         "Max Connection Time": {"selected": false, "score": 0}
+    },
+
+    "Class":{
+        "Upgrade": {"selected": false},
+        "Downgrade": {"selected": false}
     }
 }

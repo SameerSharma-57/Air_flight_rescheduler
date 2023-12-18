@@ -22,6 +22,13 @@ end = 0
 
 tf = open('timestamp.txt','w')
 
+classes = ['FirstClass', 'BusinessClass', 'PremiumEconomyClass', 'EconomyClass']
+class_idx = {'FirstClass': 0,'BusinessClass': 1, 'PremiumEconomyClass':2,'EconomyClass':3}
+inventory_class_column = ['FC_AvailableInventory', 'BC_AvailableInventory', 'PC_AvailableInventory', 'EC_AvailableInventory']
+
+def div(x):
+    return int(x/4)
+
 def record_time(message):
     global start,end
     elapsed_time = end-start
@@ -51,6 +58,7 @@ def cqm_formulation():
 
     K = len(g.path_pnr_compatibility)
     M = len(g.path_pnr_compatibility[0])
+    M = M*4
     print(K)
     print(M)
 
@@ -74,8 +82,8 @@ def cqm_formulation():
 
     start=time.time()
     for i in range(K):
-        for j in range(M):
-            qubo += X[i,j]*s.get_score(i, j)
+        for j in range(div(M)):
+            qubo += X[i,j]*s.get_score(i, div(j))
         
     cqm.set_objective(qubo)
     end=time.time()
@@ -86,14 +94,45 @@ def cqm_formulation():
         cqm.add_constraint((quicksum(X[i,j] for j in range(M)))==1)
 
     comp = g.path_pnr_compatibility
-    for i in range(K):
-        cqm.add_constraint( (quicksum(X[i,j]*comp[i][j] for j in range(M))) == 1)
+    if((not data['Class']['Upgrade']) and (not data['Class']['Downgrade'])):
 
-    for class_column,inv_column in zip(['FirstClass', 'BusinessClass', 'PremiumEconomyClass', 'EconomyClass'],['FC_AvailableInventory', 'BC_AvailableInventory', 'PC_AvailableInventory', 'EC_AvailableInventory']):
-        for j, inventory in g.inv.iterrows():
-            paths = g.path_flight_mapping[j]
-            # print(j,inventory)
-            cqm.add_constraint( (quicksum(quicksum(X[i,k] * ((int)(g.pnr.loc[i]['COS_CD']==class_column)) * g.pnr.loc[i]['PAX_CNT'] for i in range(K))for k in paths)) <= float(g.inv.loc[j][inv_column]))
+        for i in range(K):
+            cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]==(j%4)) for j in range(M))) == 1)
+
+
+    elif((data['Class']['Upgrade']) and (not data['Class']['Downgrade'])):
+
+        for i in range(K):
+            cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]>=(j%4)) for j in range(M))) == 1)
+
+        
+    elif((not data['Class']['Upgrade']) and (data['Class']['Downgrade'])):
+
+        for i in range(K):
+            cqm.add_constraint( (quicksum(X[i,j]*comp[i][j]*(class_idx[g.pnr.loc[i]['COS_CD']]<=(j%4)) for j in range(M))) == 1)
+
+    else:
+
+        for i in range(K):
+            cqm.add_constraint( (quicksum(X[i,j]*comp[i][j] for j in range(M))) == 1)
+
+
+
+    
+
+    
+
+
+    
+
+    
+   
+    for j,inventory in g.inv.iterrows():
+        paths=g.path_flight_mapping[div(j)]
+
+        cqm.add_constraint((quicksum(quicksum(X[i,k] * g.pnr.loc[i]['PAX_CNT'] for i in range(K))for k in paths)) <= float(g.inv.loc[j][inventory_class_column[j%4]]))
+
+    
 
     if(data['Flight Connection']['Max Arrival delay']['selected'] == True):
         for i in range(K):
@@ -158,20 +197,22 @@ def get_best_sample():
                 x = i.split('_')
                 x[1] = int(x[1])
                 x[2] = int(x[2])
+                row_class = classes[x[2]%4]
+                x[2] = div(x[2])
                 passenger_details = g.pnr.loc[x[1]]
                 path = g.path_mapping[x[2]]
                 score = s.get_score(x[1],x[2])
                 score*=-1
                 total_score+=score
                 
-                df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path,score])
+                df.append([passenger_details['RECLOC'],passenger_details['DEP_KEY'],path,row_class,score])
         print(total_score)
         score_list.append(total_score)
     
         df.sort()
         df=pd.DataFrame(df)
         output_file = os.path.join(output_dir, f'feasible_solution_{idx}.csv')
-        df.to_csv(output_file,index=False,header=['RECLOC','DEP_KEY','Path','Score'])
+        df.to_csv(output_file,index=False,header=['RECLOC','DEP_KEY','Path','Class','Score'])
     print(score_list)
     df = pd.DataFrame(score_list)
     df.to_csv('tempData/score.csv',index=False,header=['score'])

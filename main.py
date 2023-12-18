@@ -57,15 +57,16 @@ def main():
     # Display score inputs in the main section
     st.write("Enter Scores:")
     for category, params in parameters_data.items():
-        with st.expander(f"{category} parameters for ranking:"):
-            # Divide the number_inputs into three columns
-            col1, col2, col3 = st.columns(3)
-            i=0
-            for _i, (param, data) in enumerate(params.items()):
-                if data["selected"]:
-                    col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
-                    data["score"] = col.number_input(f"Score for {param.capitalize()}", value=data["score"] ,key=f"{param}_score")
-                    i+=1
+        if(category !='Class'):
+            with st.expander(f"{category} parameters for ranking:"):
+                # Divide the number_inputs into three columns
+                col1, col2, col3 = st.columns(3)
+                i=0
+                for _i, (param, data) in enumerate(params.items()):
+                    if data["selected"]:
+                        col = col1 if i % 3 == 0 else col2 if i % 3 == 1 else col3
+                        data["score"] = col.number_input(f"Score for {param.capitalize()}", value=data["score"] ,key=f"{param}_score")
+                        i+=1
 
     save_boolean_variables_to_json(parameters_data)
 

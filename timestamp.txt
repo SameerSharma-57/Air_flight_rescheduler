@@ -1,2 +1,0 @@
-Data Preprocessing and Path generation Time elapsed: 0 hours, 0 minutes, 38 seconds
-Qubo done Time elapsed: 0 hours, 0 minutes, 0 seconds
