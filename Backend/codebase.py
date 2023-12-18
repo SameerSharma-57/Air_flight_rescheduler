@@ -127,10 +127,18 @@ def cqm_formulation():
 
     
    
-    for j in range(M):
-        paths=g.path_flight_mapping[div(j)]
+    # for j in range(M):
+    #     paths=g.path_flight_mapping[div(j)]
 
-        cqm.add_constraint((quicksum(X[i,j] * g.pnr.loc[i]['PAX_CNT'] for i in range(K))) <= float(g.inv.loc[j][inventory_class_column[j%4]]))
+    #     cqm.add_constraint((quicksum(X[i,j] * g.pnr.loc[i]['PAX_CNT'] for i in range(K))) <= float(g.inv.loc[j][inventory_class_column[j%4]]))
+
+
+    # for class_column,inv_column in zip(['FirstClass', 'BusinessClass', 'PremiumEconomyClass', 'EconomyClass'],['FC_AvailableInventory', 'BC_AvailableInventory', 'PC_AvailableInventory', 'EC_AvailableInventory']):
+    for j, inventory in g.inv.iterrows():
+        paths = g.path_flight_mapping[j]
+        # print(j,inventory)
+        for _ in range(4):
+            cqm.add_constraint( (quicksum(quicksum(X[i,k*4+_]* g.pnr.loc[i]['PAX_CNT'] for i in range(K))for k in paths)) <= float(g.inv.loc[j][inventory_class_column[_]]))
 
 
     

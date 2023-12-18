@@ -1,5 +1,7 @@
-def div(x):
-    return int(x/4)
+from joblib import Parallel, delayed
+def process(i):
+    return i * i
+    
+results = Parallel(n_jobs=2)(delayed(process)(i) for i in range(40))
+print(results)
 
-
-print(div(5))

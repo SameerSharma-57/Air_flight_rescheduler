@@ -1,0 +1,3 @@
+Data Preprocessing and Path generation Time elapsed: 0 hours, 0 minutes, 31 seconds
+Qubo done Time elapsed: 0 hours, 0 minutes, 1 seconds
+score calculated Time elapsed: 0 hours, 4 minutes, 48 seconds
